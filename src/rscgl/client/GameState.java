@@ -17,17 +17,32 @@ import cc.morgue.lwjgl2x.audio.TinySound;
 import cc.morgue.lwjgl2x.gl.GraphicsGL;
 import cc.morgue.lwjgl2x.gl.font.TrueTypeFont;
 import cc.morgue.lwjgl2x.gl.texture.TextureManager;
+import cc.morgue.lwjgl2x.gl.texture.TextureManager.FilterType;
 import cc.morgue.lwjgl2x.gl.threed.Directions;
+import cc.morgue.lwjgl2x.gl.threed.Frustum;
+import cc.morgue.lwjgl2x.gl.threed.Water;
+import cc.morgue.lwjgl2x.gl.threed.model.obj.*;
 import cc.morgue.lwjgl2x.gl.util.MouseUtil;
 import cc.morgue.lwjgl2x.util.Utils;
+import rscgl.GameConfigs;
 import rscgl.Main;
 import rscgl.client.game.SceneBuilder;
 import rscgl.client.game.Sector;
 import rscgl.client.game.world.World;
 import rscgl.client.game.world.WorldLoader;
-import rscgl.client.threed.MudClient3D;
+import rscgl.client.threed.Sector3D;
+import rscgl.client.threed.Skybox;
+import rscgl.client.threed.Tile3D;
 import rscgl.game.scene.Scene;
 
+/**
+ * GameState uses data loaded from the Jagex cache files, using code from RSC-Remastered.
+ * The data is then managed by the LWJGL software and drawn using our own rendering methods.
+ * We are essentially just loading cache data, storing it in memory, and then re-creating the entire 3D aspect of the RSC client. It's gross, but there's no way around it...
+ * It isn't a perfect replica of the RuneScape Classic game world, but it's essentially going to be the same thing... eventually?
+ * 
+ * This class manages the 4 nearby sectors (regions), game objects (3D models), etc.
+ */
 public class GameState extends AbstractState {
 
 	// 2D
@@ -39,8 +54,9 @@ public class GameState extends AbstractState {
 	private boolean asterisk = true;
 
 	// 3D
-	private MudClient3D client;
 	private Camera camera;
+	//private final Frustum frustum;
+	private Skybox skybox;
 
 	// Audio
 	private String[] audioFile = { "advance", "anvil", "chisel", "click", "closedoor", "coins", "combat1a", "combat1b",
@@ -59,7 +75,41 @@ public class GameState extends AbstractState {
 
 	//private World world;
 	private SceneBuilder sceneBuilder;
-	//private Scene scene;
+	//private ModelRenderManager scene;
+
+	// TODO
+	// THIS IS ONLY USED ONCE AT STARTUP, TO PREVENT MAPS FROM CONSTANTLY RELOADING!!!
+	// IN THE FUTURE THIS NEEDS TO BE REMOVED AND REPLACED WITH A SYSTEM THAT ONLY RELOADS MAPS IF THE PLAYER/CAMERA HAS TRANSLATED
+	private boolean generateTerrain = true;
+
+	/**
+	 * Enable wireframe.
+	 */
+	public static final boolean DRAW_WIRE_FRAME = false;
+
+	/**
+	 * A custom feature which will be enabled in the far future...
+	 * This will render a transparent water plane at GameConfigs.WATER_LEVEL and will render above the authentic RSC water.
+	 * It can be used to create the illusion of real water in areas below WATER_LEVEL.
+	 */
+	public static final boolean DRAW_WATER_PLANE = false;
+
+	// The 4 water tiles.
+	// These are large tiles which are generated once at startup and will follow the camera.
+	// This is better than creating and rendering thousands of water tiles across the world.
+	private Water[] waterTileList = new Water[4];
+
+	// The size of a water tile.
+	private final int WATER_TILE_SIZE = 48;
+	
+	/**
+	 * Contains four 3D sectors.
+	 */
+	private Sector3D[] sector3D = new Sector3D[World.NUM_SECTORS];
+	
+	// Model related:
+	private ModelLoader loader;
+	private ModelRenderManager modelRenderManager;
 	
 	public GameState(final Engine engine) {
 		super(engine);
@@ -67,6 +117,13 @@ public class GameState extends AbstractState {
 		// Generate a pink texture.
 		// This will be used to create a visual representation of errors in 3D space.
 		TextureManager.getInstance().createTexture("pink", Color.PINK, 1, 1, 1f);
+		
+		// Load the RSC texture dump.
+		// These will be used to texture the 3D world.
+		final String texturePath = Main.ASSET_DIRECTORY + "sprites/img/texture/";
+		for (int i = 3220; i < 3274; i++) {
+			TextureManager.getInstance().addTexture("rsctexture-" + i, new File(texturePath + i + ".png"), FilterType.MIPMAP);
+		}
 		
 		// Load the fonts. Reset the chat console.
 		this.debugFont = new TrueTypeFont(new Font("Consoles", Font.PLAIN, 12));
@@ -85,6 +142,29 @@ public class GameState extends AbstractState {
 		world = new World(scene);
 		worldLoader = new WorldLoader(world);
 		sceneBuilder = new SceneBuilder(scene, world);
+		
+		// Initialize the water tiles.
+		if (DRAW_WATER_PLANE) {
+			// Load the water tile texture.
+			TextureManager.getInstance().addTexture("water", new File(Main.ASSET_DIRECTORY + "terrain/water.png"), FilterType.NEAREST);
+
+			// Construct the 4 water tiles.
+			for (int i = 0; i < 4; i++) {
+				waterTileList[i] = new Water(WATER_TILE_SIZE, GameConfigs.WATER_LEVEL, TextureManager.getInstance().getTextureId("water"));
+			}
+		}
+
+		// Initialize the skybox.
+		//this.skybox = new Skybox();
+		
+		// Initialize the array with generic data.
+		for (int i = 0; i < sector3D.length; i++) {
+			sector3D[i] = new Sector3D(-1, -1, -1);
+		}
+		
+		// Initialize 3D model support.
+		this.modelRenderManager = new ModelRenderManager();
+		this.loader = new ModelLoader();
 	}
 
 	@Override
@@ -103,7 +183,7 @@ public class GameState extends AbstractState {
 			debugFont.drawString(5, 220, "Camera: " + camera.getX() + "," + camera.getZ() + ", height: " + camera.getHeight());
 			debugFont.drawString(5, 240, "Camera Rotation: " + camera.getYaw());
 			debugFont.drawString(5, 260, "Camera Direction: " + Directions.getDirectionAsString(camera.getYaw()));
-			debugFont.drawString(5, 280, "Player: " + client.player.x + "," + client.player.z);
+			debugFont.drawString(5, 280, "");
 		//}
 
 		// Draw some centered text.
@@ -148,8 +228,61 @@ public class GameState extends AbstractState {
 		// Build the scene
 		sceneBuilder.build();
 
-		// Render the client.
-		client.render(this, camera, world);
+		// Render the skybox.
+		if (skybox != null) {
+			skybox.render();
+		}
+
+		// Water Mesh
+		if (DRAW_WATER_PLANE) {
+			float x = camera.getAbsoluteX();
+			float z = camera.getAbsoluteZ();
+			waterTileList[0].render(x, z);
+			waterTileList[1].render(x, z - WATER_TILE_SIZE);
+			waterTileList[2].render(x - WATER_TILE_SIZE, z);
+			waterTileList[3].render(x - WATER_TILE_SIZE, z - WATER_TILE_SIZE);
+		}
+		
+		// Render the 3D models.
+		modelRenderManager.render(DRAW_WIRE_FRAME);
+		
+		// Render the sectors.
+		for (int i = 0; i < sector3D.length; i++) {
+			if (sector3D[i] != null) {
+				sector3D[i].render(camera, engine.getFrustum());
+			}
+		}
+
+		// Update the 3D sectors.
+		// XXX NOTE: This is only done once at startup. If the generateTerrain boolean is always set to true, the map will reload.
+		// I currently only load this once at startup because I need to copy the logic from RSC only updates the map AS NEEDED, instead of every frame.
+		if (generateTerrain) {
+			generateTerrain = false;
+			
+			loadSectors();
+			
+			// Update the sector list.
+			System.out.println("Updating 3D sectors: " + Utils.formatTimeMillis(Utils.getCurrentTimeMillis()));
+			
+			for (Sector3D sector : sector3D) {
+				sector.unload();
+			}
+			
+			// Convert the 2D sector data into a 3D object.
+			Sector sectors2D[] = world.getSectors();
+			for (int i = 0; i < sectors2D.length; i++) {
+				if (sectors2D[i] != null) {
+					this.sector3D[i].build(this, world, sectors2D[i]);
+				}
+			}
+		}
+
+		// Render the NPCs.
+		// TODO ... long term goal?
+		
+		// Render the players.
+		// TODO ... long term goal?
+		
 	}
 
 	@Override
@@ -186,7 +319,7 @@ public class GameState extends AbstractState {
 		scene.fogZDistance = Camera.DEFAULT_FOG_DISTANCE + (cameraHeight * 2);
 		*/
 
-		camera.pollInput(keysDown, client);
+		camera.pollInput(keysDown, this);
 	}
 
 	@Override
@@ -197,15 +330,23 @@ public class GameState extends AbstractState {
 
 		// Change levels
 		if (keyCode == Keyboard.KEY_EQUALS) {
-			worldLoader.ascend(client);
+			worldLoader.ascend(this);
 			loadSectors();
-			System.out.println("Changed height level (add).");
+			this.generateTerrain = true;
+			addMessage("Changed height level (add).");
 			return;
 		}
 		if (keyCode == Keyboard.KEY_MINUS) {
-			worldLoader.descend(client);
+			worldLoader.descend(this);
 			loadSectors();
-			System.out.println("Changed height level (minus).");
+			this.generateTerrain = true;
+			addMessage("Changed height level (minus).");
+			return;
+		}
+		if (keyCode == Keyboard.KEY_F5) {
+			loadSectors();
+			this.generateTerrain = true;
+			addMessage("Reloading map sectors.");
 			return;
 		}
 		
@@ -291,9 +432,7 @@ public class GameState extends AbstractState {
 		addMessage("Welcome to RuneScape Classic OpenGL.");
 		addMessage("Use /help for commands & information.");
 		addMessage("Use WASD to move around. Arrow Keys or Middle Mouse to rotate camera.");
-
-		// Initialize the client.
-		this.client = new MudClient3D(engine.getFrustum());
+		addMessage("Key controls: - and + to change map height, F5 to reload sectors.");
 
 		// Player position is relative to the World origin
 		/*
@@ -306,10 +445,10 @@ public class GameState extends AbstractState {
 		//camera = new Camera(66 * World.TILE_WIDTH, 32 * World.TILE_DEPTH);
 		camera = new Camera(64, 64);
 		camera.setHeightOffset(32);
-		client.onStateOpen();
 		//worldLoader.loadSector(client, client.player.x, client.player.z);
-		worldLoader.loadSector(client, SPAWN_SECTOR_X, SPAWN_SECTOR_Z);
+		worldLoader.loadSector(this, SPAWN_SECTOR_X, SPAWN_SECTOR_Z);
 		//worldLoader.loadSector(client, camera.getX(), camera.getZ());
+		this.generateTerrain = true;
 	}
 
 	@Override
@@ -373,19 +512,57 @@ public class GameState extends AbstractState {
 			z = 0;
 		}
 		if (x < 16) {
-			worldLoader.loadSector(client, world.getSectorX() - 1, world.getSectorZ());
+			worldLoader.loadSector(this, world.getSectorX() - 1, world.getSectorZ());
 			x += Sector.WIDTH;
+			//this.generateTerrain = true;
 		} else if (x > 80) {
-			worldLoader.loadSector(client, world.getSectorX() + 1, world.getSectorZ());
+			worldLoader.loadSector(this, world.getSectorX() + 1, world.getSectorZ());
 			x -= Sector.WIDTH;
+			//this.generateTerrain = true;
 		}
 		if (z < 16) {
-			worldLoader.loadSector(client, world.getSectorX(), world.getSectorZ() - 1);
+			worldLoader.loadSector(this, world.getSectorX(), world.getSectorZ() - 1);
 			z += Sector.DEPTH;
+			//this.generateTerrain = true;
 		} else if (z > 80) {
-			worldLoader.loadSector(client, world.getSectorX(), world.getSectorZ() + 1);
+			worldLoader.loadSector(this, world.getSectorX(), world.getSectorZ() + 1);
 			z -= Sector.DEPTH;
+			//this.generateTerrain = true;
 		}
+	}
+
+	public Tile3D getTile(int x, int z) {
+		for (Sector3D sector : sector3D) {
+			for (Tile3D tile : sector.getListList()) {
+				if (tile.getX() == x && tile.getZ() == z) {
+					return tile;
+				}
+			}
+		}
+		return null;
+	}
+
+	public float getTileHeight(int x, int z) {
+		return getTile(x, z).getHeight();
+	}
+
+	/**
+	 * Loads a wavefront (.obj) model and adds it to the ModelRenderManager.
+	 * 
+	 * @param filename The model file name.
+	 * @param defaultTextureMaterial The default model texture material.
+	 */
+	public Model loadObjModel(String filename, String defaultTextureMaterial) {
+		try {
+			Model model = loader.loadModel(filename, defaultTextureMaterial);
+			modelRenderManager.addModel(model);
+			return model;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("Error loading model: " + filename);
+			System.exit(1);
+		}
+		return null;
 	}
 
 	public Scene getScene() {

@@ -6,10 +6,9 @@ import java.util.List;
 import cc.morgue.lwjgl2x.gl.texture.TextureManager;
 import cc.morgue.lwjgl2x.gl.threed.Frustum;
 import cc.morgue.lwjgl2x.gl.threed.VectorObject;
-import client.entityhandling.defs.TileDef;
-import client.res.Resources;
 import rscgl.GameConfigs;
 import rscgl.client.Camera;
+import rscgl.client.GameState;
 import rscgl.client.game.Sector;
 import rscgl.client.game.Tile;
 import rscgl.client.game.world.World;
@@ -57,11 +56,11 @@ public class Sector3D {
 	 * 
 	 * This is basically a custom (probably bad) recreation of WorldLoader->loadLayer
 	 */
-	public void build(MudClient3D client, World world, Sector sector2D) {
+	public void build(GameState client, World world, Sector sector2D) {
 		constructTerrainAndBuildings(client, world, sector2D);
 	}
 
-	private void constructTerrainAndBuildings(MudClient3D client, World world, Sector sector2D) {
+	private void constructTerrainAndBuildings(GameState client, World world, Sector sector2D) {
 		this.plane = sector2D.getPlane();
 		
 		// This data is only used during sector generation, then it gets disposed.
@@ -232,10 +231,10 @@ public class Sector3D {
 			if (tile.getPlane() != plane) {
 				continue;
 			}
-			tile.render(camera, frustum, MudClient3D.DRAW_WIRE_FRAME, plane);
+			tile.render(camera, frustum, GameState.DRAW_WIRE_FRAME, plane);
 		}
 		for (VectorObject object : objectList) {
-			object.render(camera, frustum, MudClient3D.DRAW_WIRE_FRAME);
+			object.render(camera, frustum, GameState.DRAW_WIRE_FRAME);
 		}
 	}
 

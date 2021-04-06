@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
-public class Scene {
+public class ModelRenderManager {
 
 	private ArrayList<Model> models = new ArrayList<Model>();
 
-	public Scene() {
+	public ModelRenderManager() {
 		
 	}
 

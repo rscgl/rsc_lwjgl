@@ -3,7 +3,7 @@ package rscgl.client.threed.obj;
 import cc.morgue.lwjgl2x.gl.threed.Frustum;
 import cc.morgue.lwjgl2x.gl.threed.model.obj.Model;
 import rscgl.Main;
-import rscgl.client.threed.MudClient3D;
+import rscgl.client.GameState;
 
 public class GameObject3D {
 
@@ -17,7 +17,7 @@ public class GameObject3D {
 	 */
 	private final int plane;
 	
-	public GameObject3D(MudClient3D client, int id, int x, int z, float tileHeight, int plane) {
+	public GameObject3D(GameState client, int id, int x, int z, float tileHeight, int plane) {
 		//this.model = geilinor.loadObjModel(Main.ASSET_DIRECTORY + "objs/" + id + ".obj", Main.ASSET_DIRECTORY + "objs/" + id + ".png");
 		this.model = client.loadObjModel(Main.ASSET_DIRECTORY + "objs/" + id + ".obj", "");
 		this.model.setPosition(x, z, tileHeight);

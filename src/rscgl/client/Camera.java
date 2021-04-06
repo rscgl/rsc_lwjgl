@@ -1,6 +1,7 @@
 package rscgl.client;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_TRANSFORM_BIT;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -9,7 +10,6 @@ import org.lwjgl.opengl.GL11;
 
 import cc.morgue.lwjgl2x.gl.threed.Vector3f;
 import rscgl.GameConfigs;
-import rscgl.client.threed.MudClient3D;
 
 public class Camera {
 
@@ -74,7 +74,7 @@ public class Camera {
 	/*
 	 * RuneScape camera, but with WASD movement.
 	 */
-	public void pollInput(boolean[] keysDown, MudClient3D terrain) {
+	public void pollInput(boolean[] keysDown, GameState terrain) {
 		// XXX
 		// Temporary method of moving the camera around in 3D space, until a player object is added to the project.
 		final float movementSpeed = 0.25f * ((keysDown[Keyboard.KEY_LSHIFT] || keysDown[Keyboard.KEY_RSHIFT]) ? 2 : 1);

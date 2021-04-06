@@ -3,9 +3,9 @@ package rscgl.client.game.world;
 import client.entityhandling.defs.TileDef;
 import client.res.Resources;
 import client.util.DataUtils;
+import rscgl.client.GameState;
 import rscgl.client.game.Sector;
 import rscgl.client.game.Tile;
-import rscgl.client.threed.MudClient3D;
 import rscgl.game.scene.Model;
 
 /**
@@ -71,7 +71,7 @@ public class WorldLoader {
 	 * @param tileZ
 	 * @return
 	 */
-	public boolean loadContainingSector(MudClient3D terrain, int tileX, int tileZ) {
+	public boolean loadContainingSector(GameState terrain, int tileX, int tileZ) {
 
 		tileX += World.START_X;
 		tileZ += World.START_Z;
@@ -95,7 +95,7 @@ public class WorldLoader {
 	 * @param sectorX
 	 * @param sectorZ
 	 */
-	public void loadSector(MudClient3D terrain, int sectorX, int sectorZ) {
+	public void loadSector(GameState terrain, int sectorX, int sectorZ) {
 
 		// Remove old models
 		world.clear();
@@ -119,7 +119,7 @@ public class WorldLoader {
 	 * @param sectorZ
 	 * @param currentLayer
 	 */
-	private void loadRequiredLayers(MudClient3D terrain, int sectorX, int sectorZ, int currentLayer) {
+	private void loadRequiredLayers(GameState terrain, int sectorX, int sectorZ, int currentLayer) {
 
 		System.out.println("Loading sector: " + sectorX + ", " + sectorZ + " (" + currentLayer + ")");
 
@@ -149,7 +149,7 @@ public class WorldLoader {
 	 * @param layer
 	 * @param isCurrentLayer
 	 */
-	private void loadLayer(MudClient3D terrain, int sectorX, int sectorZ, int layer, boolean isCurrentLayer) {
+	private void loadLayer(GameState terrain, int sectorX, int sectorZ, int layer, boolean isCurrentLayer) {
 
 		//setCurrentSector(sectorX, sectorZ, layer);
 		world.setSector(0, Resources.loadSector(sectorX - 1, sectorZ - 1, layer));
@@ -906,7 +906,7 @@ public class WorldLoader {
 	/**
 	 * Moves up a layer.
 	 */
-	public void ascend(MudClient3D terrain) {
+	public void ascend(GameState terrain) {
 
 		int currentLayer = world.getCurrentLayer();
 
@@ -927,7 +927,7 @@ public class WorldLoader {
 	/**
 	 * Moves down a layer.
 	 */
-	public void descend(MudClient3D terrain) {
+	public void descend(GameState terrain) {
 
 		int currentLayer = world.getCurrentLayer();
 
@@ -949,7 +949,7 @@ public class WorldLoader {
 	/**
 	 * Reloads the current sector.
 	 */
-	private void reloadCurrentSector(MudClient3D terrain) {
+	private void reloadCurrentSector(GameState terrain) {
 		loadSector(terrain, world.getSectorX(), world.getSectorZ());
 	}
 

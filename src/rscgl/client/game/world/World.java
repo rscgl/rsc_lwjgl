@@ -79,7 +79,7 @@ public class World {
 	public static final int LAYER_GROUND = 0;
 
 	/**
-	 * The Scene that should hold the loaded world models.
+	 * The ModelRenderManager that should hold the loaded world models.
 	 */
 	private Scene scene;
 
