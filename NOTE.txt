@@ -1,0 +1,30 @@
+
+TODO List:
+* Merge MudClient3D with GameState class.
+* Maps are flipped? https://prnt.sc/113y2xz
+* Diagonal walls aren't constructed properly.
+* Tile heights dont seem to be severe enough to look authentic. Turn down the bilinear interpolation dividers?
+* Tile3D->groundOverlay is using VectorObjects temporarily; this needs to be removed and replaced with triangles that actually match RSC ground overlays...
+* Tile3D->wall that equals a door, should be an empty space; and a Door class object would be constructed in it's place.
+* GameConfigs.TERRAIN_BRIGHTNESS_MODIFIER not implemented in roofs, walls, or models yet.
+* Load placeholder "GameObjects" (static props) into the world. If coordinates work, load the actual .obj models.
+
+Future List:
+* Tile textures (not authentic): Implement real tile textures based on color values, ie: more yellow = sand, more brown = dirt, more green = grass, and then apply a brightness modifier based on the black values from the TileColor rgb codes.
+* Verify the sprite and animation data from the RSC-Remastered code. If it's all there, and it's all usable, then we will create a test entity and attach it to the camera x/y at tile height.
+	* If the first test works, then we can implement a Mob class and spawn a some client-sided NPCs using the OpenRSC server NPC spawn configuration data.
+	* Mob visibility distance. How far away can you see an NPC, or player?
+
+Diagonal Wall Details:
+the pattern usually follows
+x, x, x, 12000 + x
+this is the only tile property that is stored as an int
+that's because diagonalWall can be either the forward diagonal or the reverse diagonal
+forward diagonal /
+reverse diagonal \
+but it is stored directly in diagonalWall regardless of what type it is
+so the forward diagonals usually match whatever int the north/east wall template is
+and the reverse diagonal is that + 12000
+
+https://github.com/2003scape
+https://github.com/2003scape/rsc-sprites
