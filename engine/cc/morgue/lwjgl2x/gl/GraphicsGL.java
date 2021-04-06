@@ -85,7 +85,7 @@ public class GraphicsGL {
 		GL11.glLoadIdentity();
 
 		disableDepthTest(); // Disable depth testing before rendering 2D components.
-		enableAlpha();
+		//enableAlpha();
 		
 		//setColor2D(Color.WHITE); // Reset color/transparency
 	}

@@ -7,10 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
 
 import cc.morgue.lwjgl2x.AbstractState;
-import cc.morgue.lwjgl2x.Config;
 import cc.morgue.lwjgl2x.Engine;
 import cc.morgue.lwjgl2x.audio.Sound;
 import cc.morgue.lwjgl2x.audio.TinySound;
@@ -19,7 +17,6 @@ import cc.morgue.lwjgl2x.gl.font.TrueTypeFont;
 import cc.morgue.lwjgl2x.gl.texture.TextureManager;
 import cc.morgue.lwjgl2x.gl.texture.TextureManager.FilterType;
 import cc.morgue.lwjgl2x.gl.threed.Directions;
-import cc.morgue.lwjgl2x.gl.threed.Frustum;
 import cc.morgue.lwjgl2x.gl.threed.Water;
 import cc.morgue.lwjgl2x.gl.threed.model.obj.*;
 import cc.morgue.lwjgl2x.gl.util.MouseUtil;
@@ -92,7 +89,7 @@ public class GameState extends AbstractState {
 	 * This will render a transparent water plane at GameConfigs.WATER_LEVEL and will render above the authentic RSC water.
 	 * It can be used to create the illusion of real water in areas below WATER_LEVEL.
 	 */
-	public static final boolean DRAW_WATER_PLANE = false;
+	public static final boolean DRAW_WATER_PLANE = true;
 
 	// The 4 water tiles.
 	// These are large tiles which are generated once at startup and will follow the camera.
@@ -122,6 +119,10 @@ public class GameState extends AbstractState {
 		// These will be used to texture the 3D world.
 		final String texturePath = Main.ASSET_DIRECTORY + "sprites/img/texture/";
 		for (int i = 3220; i < 3274; i++) {
+			if (i == 3274 + 1) {
+				System.out.println("yes");
+				System.exit(1);;
+			}
 			TextureManager.getInstance().addTexture("rsctexture-" + i, new File(texturePath + i + ".png"), FilterType.MIPMAP);
 		}
 		
@@ -146,11 +147,11 @@ public class GameState extends AbstractState {
 		// Initialize the water tiles.
 		if (DRAW_WATER_PLANE) {
 			// Load the water tile texture.
-			TextureManager.getInstance().addTexture("water", new File(Main.ASSET_DIRECTORY + "terrain/water.png"), FilterType.NEAREST);
+			//TextureManager.getInstance().addTexture("water", new File(Main.ASSET_DIRECTORY + "terrain/water.png"), FilterType.NEAREST);
 
 			// Construct the 4 water tiles.
 			for (int i = 0; i < 4; i++) {
-				waterTileList[i] = new Water(WATER_TILE_SIZE, GameConfigs.WATER_LEVEL, TextureManager.getInstance().getTextureId("water"));
+				waterTileList[i] = new Water(WATER_TILE_SIZE, GameConfigs.WATER_LEVEL, TextureManager.getInstance().getTextureId("rsctexture-3221"), false);
 			}
 		}
 
@@ -179,11 +180,11 @@ public class GameState extends AbstractState {
 		// Daw the debug hud.
 		//if (Config.RENDER_DEBUG_HUD) {
 			GraphicsGL.setColor2D(Color.ORANGE);
-			debugFont.drawString(5, 200, "Sector: " + world.getSectorX() + "," + world.getSectorZ() + ", plane: " + world.getCurrentLayer());
-			debugFont.drawString(5, 220, "Camera: " + camera.getX() + "," + camera.getZ() + ", height: " + camera.getHeight());
-			debugFont.drawString(5, 240, "Camera Rotation: " + camera.getYaw());
-			debugFont.drawString(5, 260, "Camera Direction: " + Directions.getDirectionAsString(camera.getYaw()));
-			debugFont.drawString(5, 280, "");
+			debugFont.drawString(5, 100, "Sector: " + world.getSectorX() + "," + world.getSectorZ() + ", plane: " + world.getCurrentLayer());
+			debugFont.drawString(5, 120, "Camera: " + camera.getX() + "," + camera.getZ() + ", height: " + camera.getHeight());
+			debugFont.drawString(5, 140, "Camera Rotation: " + camera.getYaw());
+			debugFont.drawString(5, 160, "Camera Direction: " + Directions.getDirectionAsString(camera.getYaw()));
+			debugFont.drawString(5, 180, "");
 		//}
 
 		// Draw some centered text.

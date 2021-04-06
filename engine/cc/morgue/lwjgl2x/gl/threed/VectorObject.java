@@ -69,12 +69,12 @@ public class VectorObject {
 		GraphicsGL.enableCulling(false, false);
 
 		if (alpha) {
-			GraphicsGL.enableAlpha();
+			//GraphicsGL.enableAlpha();
 		}
 		GL11.glBegin(GL11.GL_QUADS);
 		{
 			if (alpha) {
-				GraphicsGL.enableAlpha();
+				//GraphicsGL.enableAlpha();
 			}
 			// Top
 			GL11.glVertex3f(start[0], start[2], start[1]);
@@ -136,9 +136,12 @@ public class VectorObject {
 			GL11.glVertex3f(start[0] + width, start[2] + height, start[1]);
 			GL11.glTexCoord2f(0, 1);
 		}
+		if (alpha) {
+			//GraphicsGL.disableAlpha();
+		}
 		GL11.glEnd();
 		if (alpha) {
-			GraphicsGL.disableAlpha();
+			//GraphicsGL.disableAlpha();
 		}
 		
 		GL11.glDisable(GL11.GL_CULL_FACE); // Disable culling
@@ -169,11 +172,11 @@ public class VectorObject {
 			GL11.glColor3f(0, 0, 0); // black
 
 			if (alpha) {
-				GraphicsGL.enableAlpha();
+				//GraphicsGL.enableAlpha();
 			}
 			GL11.glCallList(meshId);
 			if (alpha) {
-				GraphicsGL.disableAlpha();
+				//GraphicsGL.disableAlpha();
 			}
 			
 			GL11.glColor3f(1, 1, 1); // white
@@ -182,11 +185,11 @@ public class VectorObject {
 		}
 
 		if (alpha) {
-			GraphicsGL.enableAlpha();
+			//GraphicsGL.enableAlpha();
 		}
 		GL11.glCallList(meshId);
 		if (alpha) {
-			GraphicsGL.disableAlpha();
+			//GraphicsGL.disableAlpha();
 		}
 	}
 

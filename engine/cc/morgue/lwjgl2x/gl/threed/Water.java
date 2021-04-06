@@ -16,10 +16,8 @@ public class Water {
 
 	private final int mesh;
 	private final float height;
-	private final float size;
 
-	public Water(float size, float height, int textureId) {
-		this.size = size;
+	public Water(float size, float height, int textureId, boolean alpha) {
 		this.height = height;
 
 		float startX = 0;
@@ -38,8 +36,10 @@ public class Water {
 		GraphicsGL.setColor3D(Color.WHITE, 1f);
 
 		// Enable blending. Without this, transparency may not render as expected.
-		GraphicsGL.enableAlpha();
-
+		if (alpha) {
+			GraphicsGL.enableAlpha();
+		}
+		
 		// Bind the given texture to the object
 		TextureManager.getInstance().bind(textureId);
 
@@ -79,7 +79,9 @@ public class Water {
 			GL11.glVertex3f(startX, height, startZ);
 		}
 
-		GraphicsGL.disableAlpha();
+		if (alpha) {
+			GraphicsGL.disableAlpha();
+		}
 		
 		GL11.glEnd();
 		GraphicsGL.disableCulling();

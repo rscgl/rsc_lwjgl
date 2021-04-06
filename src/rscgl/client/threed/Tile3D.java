@@ -99,178 +99,84 @@ public class Tile3D {
 	
 		// Create the roof.
 		if (roofTexture != 0) {
-			int roofTextureId = -1;
-			switch (roofTextureId) {
-			default:
-				roofTextureId = TextureManager.getInstance().getTextureId("roof");
-				break;
-			}
-			if (roofTextureId != -1) {
-				float[] roofStart = { start[0], start[1], start[2] };
-				float[] roofEnd = { -1, -1, -1 };
-				roofStart[0] = roofStart[0];
-				roofStart[1] = roofStart[1];
-				roofStart[2] = roofStart[2] + GameConfigs.WALL_HEIGHT;
-				roofEnd[0] = roofStart[0] + 1f; // x (width)
-				roofEnd[1] = roofStart[1] + 1f; // z (depth)
-				roofEnd[2] = roofStart[2] + 0.1f; // y (height)
-				objects.add(new VectorObject(roofStart, roofEnd, roofTextureId));
-			}
+			float[] roofStart = { start[0], start[1], start[2] };
+			float[] roofEnd = { -1, -1, -1 };
+			roofStart[0] = roofStart[0];
+			roofStart[1] = roofStart[1];
+			roofStart[2] = roofStart[2] + GameConfigs.WALL_HEIGHT;
+			roofEnd[0] = roofStart[0] + 1f; // x (width)
+			roofEnd[1] = roofStart[1] + 1f; // z (depth)
+			roofEnd[2] = roofStart[2] + 0.1f; // y (height)
+			int roofTextureId = TextureManager.getInstance().getTextureId("rsctexture-3226");
+			objects.add(new VectorObject(roofStart, roofEnd, roofTextureId));
 		}
 
 		// Create the horizontal wall.
 		if (horizontalWall != 0) {
-			int horizontalWallTextureId = -1;
-			boolean alpha = false;
-			switch (horizontalWall) {
-			case WallTextureConstants.WOODEN_DOOR_FRAME:
-			case WallTextureConstants.STONE_DOOR_FRAME:
-			case WallTextureConstants.STONE_DOUBLE_ARCH_DOOR_FRAME:
-				// Don't create a wall when it's supposed to be a door.
-				// TODO: Construct a door object instead.
-				break;
+			float[] hWallStart = { start[0], start[1], start[2] };
+			float[] hWallEnd = { -1, -1, -1 };
+			hWallStart[0] = hWallStart[0];
+			hWallStart[1] = hWallStart[1];
+			hWallStart[2] = hWallStart[2];
+			hWallEnd[0] = hWallStart[0] + GameConfigs.WALL_DEPTH; // x (width)
+			hWallEnd[1] = hWallStart[1] + 1f; // z (depth)
+			hWallEnd[2] = hWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
+			
+			// Get the RSC texture.
+			int horizontalWallTextureId = getWallTextureId(horizontalWall)[1];
 
-
-			case WallTextureConstants.PICKET_FENCE:
-				horizontalWallTextureId = TextureManager.getInstance().getTextureId("fence_wooden");
-				alpha = true;
-				break;
-			case WallTextureConstants.METAL_FENCE_1:
-			case WallTextureConstants.METAL_FENCE_2:
-				horizontalWallTextureId = TextureManager.getInstance().getTextureId("fence_metal");
-				alpha = true;
-				break;
-
-			case WallTextureConstants.STONE_WALL:
-			case WallTextureConstants.STONE_WINDOW_GLASS:
-			case WallTextureConstants.STONE_WINDOW_GLASS_DECORATIVE:
-			case WallTextureConstants.STONE_WALL_ARDOUGNE:
-			case WallTextureConstants.STONE_HALF_WALL:
-			case WallTextureConstants.STONE_WINDOW_ARCH:
-			case WallTextureConstants.SWAMP_WALL:
-			case WallTextureConstants.STONE_WALL_RUINS:
-			case WallTextureConstants.LAVA_ROCK_WALL:
-				horizontalWallTextureId = TextureManager.getInstance().getTextureId("stone");
-				break;
-
-			case WallTextureConstants.WOODEN_WALL_WHITE:
-			case WallTextureConstants.WOODEN_WALL_WHITE_WINDOW:
-				horizontalWallTextureId = TextureManager.getInstance().getTextureId("wood_white");
-				break;
-				
-			case WallTextureConstants.WOODEN_PANEL_WALL:
-			case WallTextureConstants.WOODEN_PANEL_WINDOW:
-				horizontalWallTextureId = TextureManager.getInstance().getTextureId("wood");
-				break;
-				
-			case WallTextureConstants.JUNGLE_INVISIBLE_WALL:
-			case WallTextureConstants.CAVE_INVISIBLE_WALL:
-			//case WallTextureConstants.WOODEN_SHACK_WINDOW:
-				horizontalWallTextureId = TextureManager.getInstance().getTextureId("pink");
-				break;
-				
-			default:
-				Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Unhandled horizontal wall: " + horizontalWall);
-				break;
-			}
-			if (horizontalWallTextureId != -1) {
-				float[] hWallStart = { start[0], start[1], start[2] };
-				float[] hWallEnd = { -1, -1, -1 };
-				hWallStart[0] = hWallStart[0];
-				hWallStart[1] = hWallStart[1];
-				hWallStart[2] = hWallStart[2];
-				hWallEnd[0] = hWallStart[0] + GameConfigs.WALL_DEPTH; // x (width)
-				hWallEnd[1] = hWallStart[1] + 1f; // z (depth)
-				hWallEnd[2] = hWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
-				objects.add(new VectorObject(hWallStart, hWallEnd, horizontalWallTextureId, alpha));
+			// Apply the texture.
+			// Set the vector object alpha to true, if needed.
+			if (getWallTextureId(horizontalWall)[0] == 1) {
+				objects.add(new VectorObject(hWallStart, hWallEnd, horizontalWallTextureId, true));
+			} else {
+				objects.add(new VectorObject(hWallStart, hWallEnd, horizontalWallTextureId));
 			}
 		}
 
 		// Create the vertical wall.
 		if (verticalWall != 0) {
-			int verticalWallTextureId = -1;
-			boolean alpha = false;
-			switch (verticalWall) {
-			case WallTextureConstants.WOODEN_DOOR_FRAME:
-			case WallTextureConstants.STONE_DOOR_FRAME:
-			case WallTextureConstants.STONE_DOUBLE_ARCH_DOOR_FRAME:
-				// Don't create a wall when it's supposed to be a door.
-				// TODO: Construct a door object instead.
-				break;
+			float[] vWallStart = { start[0], start[1], start[2] };
+			float[] vWallEnd = { -1, -1, -1 };
+			vWallStart[0] = vWallStart[0];
+			vWallStart[1] = vWallStart[1];
+			vWallStart[2] = vWallStart[2];
+			vWallEnd[0] = vWallStart[0] + 1; // x (width)
+			vWallEnd[1] = vWallStart[1] + GameConfigs.WALL_DEPTH; // z (depth)
+			vWallEnd[2] = vWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
+			
+			// Get the RSC texture.
+			int verticalWallTextureId = getWallTextureId(verticalWall)[1];
 
-			case WallTextureConstants.PICKET_FENCE:
-				verticalWallTextureId = TextureManager.getInstance().getTextureId("fence_wooden");
-				alpha = true;
-				break;
-			case WallTextureConstants.METAL_FENCE_1:
-			case WallTextureConstants.METAL_FENCE_2:
-				verticalWallTextureId = TextureManager.getInstance().getTextureId("fence_metal");
-				alpha = true;
-				break;
-
-			case WallTextureConstants.STONE_WALL:
-			case WallTextureConstants.STONE_WINDOW_GLASS:
-			case WallTextureConstants.STONE_WINDOW_GLASS_DECORATIVE:
-			case WallTextureConstants.STONE_WALL_ARDOUGNE:
-			case WallTextureConstants.STONE_HALF_WALL:
-			case WallTextureConstants.STONE_WINDOW_ARCH:
-			case WallTextureConstants.SWAMP_WALL:
-			case WallTextureConstants.STONE_WALL_RUINS:
-			case WallTextureConstants.LAVA_ROCK_WALL:
-				verticalWallTextureId = TextureManager.getInstance().getTextureId("stone");
-				break;
-
-			case WallTextureConstants.WOODEN_WALL_WHITE:
-			case WallTextureConstants.WOODEN_WALL_WHITE_WINDOW:
-				verticalWallTextureId = TextureManager.getInstance().getTextureId("wood_white");
-				break;
-				
-			case WallTextureConstants.WOODEN_PANEL_WALL:
-			case WallTextureConstants.WOODEN_PANEL_WINDOW:
-				verticalWallTextureId = TextureManager.getInstance().getTextureId("wood");
-				break;
-				
-			case WallTextureConstants.JUNGLE_INVISIBLE_WALL:
-			case WallTextureConstants.CAVE_INVISIBLE_WALL:
-			//case WallTextureConstants.WOODEN_SHACK_WINDOW:
-				verticalWallTextureId = TextureManager.getInstance().getTextureId("pink");
-				break;
-				
-			default:
-				Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Unhandled horizontal wall: " + verticalWall);
-				break;
-			}
-			if (verticalWallTextureId != -1) {
-				float[] vWallStart = { start[0], start[1], start[2] };
-				float[] vWallEnd = { -1, -1, -1 };
-				vWallStart[0] = vWallStart[0];
-				vWallStart[1] = vWallStart[1];
-				vWallStart[2] = vWallStart[2];
-				vWallEnd[0] = vWallStart[0] + 1; // x (width)
-				vWallEnd[1] = vWallStart[1] + GameConfigs.WALL_DEPTH; // z (depth)
-				vWallEnd[2] = vWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
-				objects.add(new VectorObject(vWallStart, vWallEnd, verticalWallTextureId, alpha));
+			// Apply the texture.
+			// Set the vector object alpha to true, if needed.
+			if (getWallTextureId(verticalWall)[0] == 1) {
+				objects.add(new VectorObject(vWallStart, vWallEnd, verticalWallTextureId, true));
+			} else {
+				objects.add(new VectorObject(vWallStart, vWallEnd, verticalWallTextureId));
 			}
 		}
 
 		// TODO implement hard-coded rotations based on the debug value?
 		// Create the diagonal walls.
 		if (diagonalWalls != 0) {
-			int diagonalWallsTextureId = -1;//TextureManager.getInstance().getTextureId("stone");
-			switch (diagonalWalls) {
-			default:
-				//System.out.println("Unhandled diagonal wall: " + diagonalWalls);
-				break;
-			}
-			if (diagonalWallsTextureId != -1) {
-				float[] dWallStart = { start[0], start[1], start[2] };
-				float[] dWallEnd = { -1, -1, -1 };
-				dWallStart[0] = dWallStart[0] - GameConfigs.WALL_DEPTH / 2;
-				dWallStart[1] = dWallStart[1] - GameConfigs.WALL_DEPTH / 2;
-				dWallStart[2] = dWallStart[2];
-				dWallEnd[0] = dWallStart[0] + GameConfigs.WALL_DEPTH / 2; // x (width}
-				dWallEnd[1] = dWallStart[1] + GameConfigs.WALL_DEPTH / 2; // z (depth)
-				dWallEnd[2] = dWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
+			float[] dWallStart = { start[0], start[1], start[2] };
+			float[] dWallEnd = { -1, -1, -1 };
+			dWallStart[0] = dWallStart[0] - GameConfigs.WALL_DEPTH / 2;
+			dWallStart[1] = dWallStart[1] - GameConfigs.WALL_DEPTH / 2;
+			dWallStart[2] = dWallStart[2];
+			dWallEnd[0] = dWallStart[0] + GameConfigs.WALL_DEPTH / 2; // x (width}
+			dWallEnd[1] = dWallStart[1] + GameConfigs.WALL_DEPTH / 2; // z (depth)
+			dWallEnd[2] = dWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
+			
+			// Get the RSC texture.
+			int diagonalWallsTextureId = getWallTextureId(diagonalWalls)[1];
+
+			// Apply the texture.
+			// Set the vector object alpha to true, if needed.
+			if (getWallTextureId(diagonalWalls)[0] == 1) {
+				//objects.add(new VectorObject(dWallStart, dWallEnd, diagonalWallsTextureId, true));
+			} else {
 				//objects.add(new VectorObject(dWallStart, dWallEnd, diagonalWallsTextureId));
 			}
 		}
@@ -285,7 +191,7 @@ public class Tile3D {
 				break;
 			case 3:
 				// wooden, building floor, etc.
-				groundOverlayTextureId = TextureManager.getInstance().getTextureId("wood");
+				groundOverlayTextureId = TextureManager.getInstance().getTextureId("rsctexture-3223");
 				break;
 			//case TileTextureConstants.GROUND_OVERLAY_WATER_BLUE:
 			case TileTextureConstants.GROUND_OVERLAY_FLOOR_GRAY:
@@ -354,6 +260,70 @@ public class Tile3D {
 
 	public int getPlane() {
 		return plane;
+	}
+	
+	/**
+	 * This returns the wall texture data.
+	 * @param wallIndex The wall data value read from the jagex cache.
+	 * @return alpha, textureId
+	 */
+	private int[] getWallTextureId(int wallIndex) {
+		
+		boolean alpha = false;
+		int textureId = TextureManager.getInstance().getTextureId("pink");//pink = error texture
+
+		switch (wallIndex) {
+		case WallTextureConstants.WOODEN_DOOR_FRAME:
+		case WallTextureConstants.STONE_DOOR_FRAME:
+		case WallTextureConstants.STONE_DOUBLE_ARCH_DOOR_FRAME:
+			// Don't create a wall when it's supposed to be a door.
+			// TODO: Construct a door object instead.
+			break;
+
+
+		case WallTextureConstants.PICKET_FENCE:
+			textureId = TextureManager.getInstance().getTextureId("rsctexture-3230");
+			//alpha = true;
+			break;
+		case WallTextureConstants.METAL_FENCE_1:
+		case WallTextureConstants.METAL_FENCE_2:
+			textureId = TextureManager.getInstance().getTextureId("rsctexture-3232");
+			//alpha = true;
+			break;
+
+		case WallTextureConstants.STONE_WALL:
+		case WallTextureConstants.STONE_WINDOW_GLASS:
+		case WallTextureConstants.STONE_WINDOW_GLASS_DECORATIVE:
+		case WallTextureConstants.STONE_WALL_ARDOUGNE:
+		case WallTextureConstants.STONE_HALF_WALL:
+		case WallTextureConstants.STONE_WINDOW_ARCH:
+		case WallTextureConstants.SWAMP_WALL:
+		case WallTextureConstants.STONE_WALL_RUINS:
+		case WallTextureConstants.LAVA_ROCK_WALL:
+			textureId = TextureManager.getInstance().getTextureId("rsctexture-3222");
+			break;
+
+		case WallTextureConstants.WOODEN_WALL_WHITE:
+		case WallTextureConstants.WOODEN_WALL_WHITE_WINDOW:
+			textureId = TextureManager.getInstance().getTextureId("rsctexture-3241");
+			break;
+			
+		case WallTextureConstants.WOODEN_PANEL_WALL:
+		case WallTextureConstants.WOODEN_PANEL_WINDOW:
+			textureId = TextureManager.getInstance().getTextureId("rsctexture-3223");
+			break;
+			
+		case WallTextureConstants.JUNGLE_INVISIBLE_WALL:
+		case WallTextureConstants.CAVE_INVISIBLE_WALL:
+		//case WallTextureConstants.WOODEN_SHACK_WINDOW:
+			break;
+			
+		default:
+			Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Unhandled wall texture requested, index: " + wallIndex);
+			break;
+		}
+		
+		return new int[] { alpha ? 1 : 0, textureId };
 	}
 
 }
