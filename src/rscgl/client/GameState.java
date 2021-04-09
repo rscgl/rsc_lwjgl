@@ -178,14 +178,11 @@ public class GameState extends AbstractState {
 		//TextureManager.getInstance().draw("rsclogo", (Display.getWidth() / 2) - 150, -50);
 
 		// Daw the debug hud.
-		//if (Config.RENDER_DEBUG_HUD) {
-			GraphicsGL.setColor2D(Color.ORANGE);
-			debugFont.drawString(5, 100, "Sector: " + world.getSectorX() + "," + world.getSectorZ() + ", plane: " + world.getCurrentLayer());
-			debugFont.drawString(5, 120, "Camera: " + camera.getX() + "," + camera.getZ() + ", height: " + camera.getHeight());
-			debugFont.drawString(5, 140, "Camera Rotation: " + camera.getYaw());
-			debugFont.drawString(5, 160, "Camera Direction: " + Directions.getDirectionAsString(camera.getYaw()));
-			debugFont.drawString(5, 180, "");
-		//}
+		debugFont.drawShadowedString(Color.ORANGE, Color.BLACK, 1, 5, 100, "Sector: " + world.getSectorX() + "," + world.getSectorZ() + ", plane: " + world.getCurrentLayer());
+		debugFont.drawShadowedString(Color.ORANGE, Color.BLACK, 1, 5, 120, "Camera: " + camera.getX() + "," + camera.getZ() + ", height: " + camera.getHeight());
+		debugFont.drawShadowedString(Color.ORANGE, Color.BLACK, 1, 5, 140, "Camera Rotation: " + camera.getYaw());
+		debugFont.drawShadowedString(Color.ORANGE, Color.BLACK, 1, 5, 160, "Camera Direction: " + Directions.getDirectionAsString(camera.getYaw()));
+		debugFont.drawShadowedString(Color.ORANGE, Color.BLACK, 1, 5, 180, "");
 
 		// Draw some centered text.
 		//GraphicsGL.setColor2D(Color.GREEN);

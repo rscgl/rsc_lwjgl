@@ -3,11 +3,9 @@ package cc.morgue.lwjgl2x.gl.threed;
 import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
 
 import cc.morgue.lwjgl2x.Config;
 import cc.morgue.lwjgl2x.gl.GraphicsGL;
-import cc.morgue.lwjgl2x.gl.threed.model.obj.Model;
 import rscgl.client.Camera;
 
 /**
@@ -22,18 +20,13 @@ public class VectorObject {
 	private final float length;						// Logic: length = end z - start z
 	private final float height;						// Logic: height = end y - start y
 	private final boolean alpha;
-	private final Vector3f location;				// The centered position of the object - it's "core"
 	private boolean visible = true;					// Whether or not the mesh can be rendered
-	
-	@SuppressWarnings("unused")
-	private boolean useAABB = false;				// Enable collision detection? Default = false
 
 	public VectorObject(int meshId, float[] start, float[] end, boolean alpha) {
 		setCollisionSize(start, end);
 		this.width = end[0] - start[0]; // end x - start x
 		this.length = end[1] - start[1]; // end z - start z
 		this.height = end[2] - start[2]; // end height - start height
-		this.location = new Vector3f(start[0] + (width / 2), start[2], start[1] + (length / 2)); // Absolute centered position
 		this.meshId = meshId;
 		this.alpha = alpha;
 	}
@@ -191,16 +184,6 @@ public class VectorObject {
 		if (alpha) {
 			//GraphicsGL.disableAlpha();
 		}
-	}
-
-	public Vector3f getLocation() {
-		return location;
-	}
-
-	public void setLocation(float x, float z, float height) {
-		this.location.x = x + (width / 2);
-		this.location.z = z + (length / 2);
-		this.location.y = height;
 	}
 
 	/**

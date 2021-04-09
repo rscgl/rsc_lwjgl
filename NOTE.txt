@@ -1,11 +1,10 @@
 
 TODO List:
-* Merge MudClient3D with GameState class.
 * Maps are flipped? https://prnt.sc/113y2xz
 * Diagonal walls aren't constructed properly.
 * Tile heights dont seem to be severe enough to look authentic. Turn down the bilinear interpolation dividers?
-* Tile3D->groundOverlay is using VectorObjects temporarily; this needs to be removed and replaced with triangles that actually match RSC ground overlays...
-* Tile3D->wall that equals a door, should be an empty space; and a Door class object would be constructed in it's place.
+* Tile3D->groundOverlay is using VectorObjects temporarily; this needs to be removed and replaced with triangles that actually match RSC ground overlays... Maybe the Tile3D class could store each of the 2 triangles as objects, and the ground overlay could override the tile color.
+* Tile3D->wall that equals a door, should be an empty (pink placeholder) space; and a Door class object would be constructed in it's place.
 * GameConfigs.TERRAIN_BRIGHTNESS_MODIFIER not implemented in roofs, walls, or models yet.
 * Load placeholder "GameObjects" (static props) into the world. If coordinates work, load the actual .obj models.
 
@@ -16,8 +15,7 @@ Future List:
 	* Mob visibility distance. How far away can you see an NPC, or player?
 
 Diagonal Wall Details:
-the pattern usually follows
-x, x, x, 12000 + x
+the pattern usually follows: x, x, x, 12000 + x
 this is the only tile property that is stored as an int
 that's because diagonalWall can be either the forward diagonal or the reverse diagonal
 forward diagonal /

@@ -5,7 +5,7 @@ package client.entityhandling.defs;
  */
 public class AnimationDef {
 
-	public String name;
+	public String name; 
 	public int charColour;
 	public int genderModel;
 	public boolean hasA;

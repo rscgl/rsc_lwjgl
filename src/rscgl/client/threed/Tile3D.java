@@ -162,22 +162,45 @@ public class Tile3D {
 		if (diagonalWalls != 0) {
 			float[] dWallStart = { start[0], start[1], start[2] };
 			float[] dWallEnd = { -1, -1, -1 };
-			dWallStart[0] = dWallStart[0] - GameConfigs.WALL_DEPTH / 2;
-			dWallStart[1] = dWallStart[1] - GameConfigs.WALL_DEPTH / 2;
-			dWallStart[2] = dWallStart[2];
-			dWallEnd[0] = dWallStart[0] + GameConfigs.WALL_DEPTH / 2; // x (width}
-			dWallEnd[1] = dWallStart[1] + GameConfigs.WALL_DEPTH / 2; // z (depth)
-			dWallEnd[2] = dWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
 			
-			// Get the RSC texture.
-			int diagonalWallsTextureId = getWallTextureId(diagonalWalls)[1];
+			// Start coordinates are whatever the RSC cache says.
+			dWallStart[0] = dWallStart[0];
+			dWallStart[1] = dWallStart[1];
+			dWallStart[2] = dWallStart[2];
 
+			// Get the RSC texture.
+			int diagonalWallsTextureId = TextureManager.getInstance().getTextureId("pink");//getWallTextureId(diagonalWalls)[1];
+			
+			// TODO determine rotation
+			if (diagonalWalls > 0 && diagonalWalls <= 12000 + 255) { // 255 is just a guess since jagex likes to store the tiniest variable data possible they prob used a byte
+				diagonalWalls = diagonalWalls - 12000;
+				diagonalWallsTextureId = getWallTextureId(diagonalWalls - 12000)[0];
+				//System.out.println("diagonalWalls:" + (diagonalWalls - 12000));
+				dWallEnd[0] = dWallStart[0] + 0.5f; // x (width)
+				dWallStart[0] = dWallStart[0] - 0.5f;
+				dWallEnd[1] = dWallStart[1]; // z (depth)
+				dWallEnd[2] = dWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
+			}
+			
+			// TODO determine rotation
+			if (diagonalWalls >= 48000) {
+				diagonalWalls = diagonalWalls - 48000;
+				diagonalWallsTextureId = getWallTextureId(diagonalWalls)[0];
+				//System.out.println("diagonalWalls:" + (diagonalWalls));
+				dWallEnd[0] = dWallStart[0]; // x (width)
+				dWallEnd[1] = dWallStart[1] + 0.5f; // z (depth)
+				dWallStart[1] = dWallStart[1] - 0.5f;
+				dWallEnd[2] = dWallStart[2] + GameConfigs.WALL_HEIGHT; // y (height)
+			}
+			
 			// Apply the texture.
 			// Set the vector object alpha to true, if needed.
 			if (getWallTextureId(diagonalWalls)[0] == 1) {
-				//objects.add(new VectorObject(dWallStart, dWallEnd, diagonalWallsTextureId, true));
+				VectorObject object = new VectorObject(dWallStart, dWallEnd, diagonalWallsTextureId, true);
+				objects.add(object);
 			} else {
-				//objects.add(new VectorObject(dWallStart, dWallEnd, diagonalWallsTextureId));
+				VectorObject object = new VectorObject(dWallStart, dWallEnd, diagonalWallsTextureId);
+				objects.add(object);
 			}
 		}
 		
