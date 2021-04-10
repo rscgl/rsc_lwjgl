@@ -18,6 +18,6 @@ This project is unlicensed. Do whatever you want with it. If you end up forking 
 
 ## Acknowledgments
 Information, code snippets, etc.
-* [Morgue](https://.github.com/ModsByMorgue)
+* [Morgue](https://github.com/ModsByMorgue) (creator of the lwjgl engine, smashed RSC-Remastered data into lwjgl, managed to get the basics started after multiple failed attempts...)
 * [RSC-Remastered](https://github.com/Danjb1/rsc-remastered/)
-* [OpenRSC Community](https://github.com/Open-RSC)
+* [OpenRSC Community](https://github.com/Open-RSC) (Luis (3d model dump), Logg (various info), pyramin (for a lot of extremely useful client information, such as tile colors, wall data, etc)
