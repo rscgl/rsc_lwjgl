@@ -10,7 +10,7 @@ Some issues include: the map data seems to be flipped? diagonal walls weren't fi
 The project is ready to run in Eclipse, though, you can use any IDE you want.
 
 ## Screenshot
-![alt text](http://url/to/img.png)
+![alt text](https://github.com/rscgl/rsc_lwjgl/blob/master/screenshot.png)
 
 
 ## License
