@@ -197,10 +197,10 @@ public class Tile3D {
 			// Set the vector object alpha to true, if needed.
 			if (getWallTextureId(diagonalWalls)[0] == 1) {
 				VectorObject object = new VectorObject(dWallStart, dWallEnd, diagonalWallsTextureId, true);
-				objects.add(object);
+				//objects.add(object);
 			} else {
 				VectorObject object = new VectorObject(dWallStart, dWallEnd, diagonalWallsTextureId);
-				objects.add(object);
+				//objects.add(object);
 			}
 		}
 		
